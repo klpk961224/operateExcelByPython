@@ -2,6 +2,7 @@ import datetime
 import xlrd
 import xlwt
 from mysqlhelper import *
+import StoreInfoObj
 
 
 # 操作工作簿
@@ -176,6 +177,7 @@ class StoreInfo:
 
 
 if __name__ == "__main__":
+    start_time = datetime.datetime.now()
     # 通过xlrd读取表格数据
     data = xlrd.open_workbook("美团外卖店铺信息采集（去重）.xlsx")
     # 操作工作簿
@@ -208,15 +210,21 @@ if __name__ == "__main__":
     data_list = []
     for i, item in enumerate(target_list):
         # 先实例化后用于接受
-        obj = StoreInfo()
-        obj.store_name = target_list[i][0]
-        obj.store_url = target_list[i][1]
-        obj.store_address = target_list[i][2]
-        obj.store_consumption = target_list[i][3]
-        obj.store_score = target_list[i][4]
-        obj.comment_count = target_list[i][5]
+        obj = StoreInfoObj.StoreInfoObj(target_list[i][0],
+                                        target_list[i][1],
+                                        target_list[i][2],
+                                        target_list[i][3],
+                                        target_list[i][4],
+                                        target_list[i][5])
+        # obj = StoreInfo()
+        # obj.store_name = target_list[i][0]
+        # obj.store_url = target_list[i][1]
+        # obj.store_address = target_list[i][2]
+        # obj.store_consumption = target_list[i][3]
+        # obj.store_score = target_list[i][4]
+        # obj.comment_count = target_list[i][5]
         data_list.append(obj)
-
+    print(data_list)
     # 链接到数据库
     db = dbhelper('127.0.0.1', 3306, "root", "123456", "test")
     # 插入语句
@@ -226,5 +234,7 @@ if __name__ == "__main__":
         val.append((item.store_name, item.store_url, item.store_address, item.store_consumption, item.store_score,
                     item.comment_count))
     print(val)
-    db.executemanydata(sql, val)
-    wb.save("wx奶茶店铺数据202204_%s.xls" % (datetime.datetime.now().strftime("%Y%m%d%H%M%S")))
+    # db.executemanydata(sql, val)
+    # wb.save("wx奶茶店铺数据202204_%s.xls" % (datetime.datetime.now().strftime("%Y%m%d%H%M%S")))
+    end_time = datetime.datetime.now()
+    print(end_time - start_time)
